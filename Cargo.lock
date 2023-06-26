@@ -342,6 +342,7 @@ name = "rust-aws-lambda"
 version = "0.1.0"
 dependencies = [
  "lambda_runtime",
+ "serde",
  "serde_json",
  "tokio",
 ]

@@ -1,12 +1,19 @@
 use lambda_runtime::{service_fn, Error, LambdaEvent};
 use serde_json::{json, Value};
 
+#[derive(Debug, PartialEq, serde::Serialize)]
+struct HelloResponse {
+    message: String,
+}
+
 // Send a greeting
-fn say_hello(name: Option<&str>) -> String {
+fn say_hello(name: Option<&str>) -> HelloResponse {
     // if a name was not provided, address the greeting to "stranger"
     let name = name.unwrap_or("stranger");
 
-    format!("Hello, {name}!")
+    HelloResponse {
+        message: format!("Hello, {name}!"),
+    }
 }
 
 // Wrapper for our core function
@@ -35,20 +42,30 @@ mod tests {
     fn test_name_provided() {
         let name = "world";
         let result = say_hello(Some(name));
-        assert_eq!(format!("Hello, {name}!"), result);
+        assert_eq!(
+            HelloResponse {
+                message: format!("Hello, {name}!")
+            },
+            result
+        );
     }
 
     #[test]
     fn test_no_name_provided() {
         let result = say_hello(None);
-        assert_eq!("Hello, stranger!".to_owned(), result);
+        assert_eq!(
+            HelloResponse {
+                message: "Hello, stranger!".into()
+            },
+            result
+        );
     }
 
     #[tokio::test]
     async fn test_wrapper_name_provided() {
         let name = "world";
         let event = LambdaEvent::new(json!({ "name": name }), Context::default());
-        let expected_result = json!(format!("Hello, {name}!"));
+        let expected_result = json!({ "message": format!("Hello, {name}!") });
 
         let result = run_lambda(event).await;
 
@@ -63,7 +80,7 @@ mod tests {
             json!({ "meaningless_key": "meaningless_value" }),
             Context::default(),
         );
-        let expected_result = json!(format!("Hello, stranger!"));
+        let expected_result = json!({ "message": format!("Hello, stranger!") });
 
         let result = run_lambda(event).await;
 
