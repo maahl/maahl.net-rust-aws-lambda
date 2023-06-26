@@ -19,8 +19,10 @@ fn say_hello(name: Option<&str>) -> HelloResponse {
 // Wrapper for our core function
 // Its role is to extract the relevant info from the incoming event, and convert the
 // response to json.
+#[tracing::instrument()]
 async fn run_lambda(event: LambdaEvent<Value>) -> Result<Value, Error> {
-    let (event, _context) = event.into_parts();
+    let (event, context) = event.into_parts();
+    tracing::info!(event = ?event, context = ?context);
 
     let name = event["name"].as_str();
     let result = say_hello(name);
@@ -30,6 +32,11 @@ async fn run_lambda(event: LambdaEvent<Value>) -> Result<Value, Error> {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .with_ansi(false) // no colors as they look messed up in Cloudwatch
+        .init();
+
     lambda_runtime::run(service_fn(run_lambda)).await
 }
 
