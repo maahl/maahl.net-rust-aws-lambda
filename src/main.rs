@@ -33,8 +33,12 @@ async fn run_lambda(event: LambdaEvent<Value>) -> Result<Value, Error> {
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     tracing_subscriber::fmt()
+        .json()
+        .with_env_filter(tracing_subscriber::filter::EnvFilter::from_default_env())
         .with_max_level(tracing::Level::INFO)
-        .with_ansi(false) // no colors as they look messed up in Cloudwatch
+        .with_target(false)
+        .with_current_span(false)
+        .without_time()
         .init();
 
     lambda_runtime::run(service_fn(run_lambda)).await
