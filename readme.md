@@ -11,3 +11,4 @@ Tested with Rust 1.73.0, Terraform 1.6.3.
 * [Cargo Lambda](https://www.cargo-lambda.info/)
 * [tracing documentation](https://docs.rs/tracing/latest/tracing/)
 * [Lambda logging in Rust](https://docs.aws.amazon.com/lambda/latest/dg/rust-logging.html)
+* [Performance tips](https://nnethercote.github.io/perf-book/build-configuration.html)
